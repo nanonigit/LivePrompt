@@ -1,0 +1,56 @@
+# LivePrompt
+
+[English](README.md) | [日本語](README.ja.md)
+
+LivePrompt は、Mac で再生される音声を英語字幕にし、日本語訳と英語の質問・返答案を半透明のプロンプターに表示する macOS アプリです。会議アプリの上に重ねて使えます。
+
+## 動作条件
+
+- macOS 26 以降の Apple Silicon Mac
+- システムオーディオ録音の許可
+- 質問・返答案には Apple Intelligence が必要
+- 初回の Apple 言語モデル取得にはインターネット接続が必要
+
+## インストール
+
+Homebrew Formula は、この Mac でソースからアプリをビルドします。未署名のアプリバイナリはダウンロードしません。
+
+```sh
+brew install nanonigit/liveprompt/liveprompt
+liveprompt
+```
+
+Swift 6.4 と Xcode Command Line Tools で手動ビルドする場合:
+
+```sh
+./script/package_app.sh --release
+open dist/LivePrompt.app
+```
+
+開発時は `./script/build_and_run.sh --verify` でデバッグ版のビルド、起動、プロセス確認を行えます。再ビルドする前に LivePrompt を終了してください。
+
+## 使い方
+
+1. LivePrompt を開いて「開始」を押します。
+2. 初回は macOS の「システムオーディオ録音」を許可し、英語認識・翻訳の言語モデルの準備を待ちます。
+3. Zoom、Meet、Teams、ブラウザーなどで英語音声を再生します。英語字幕の後に日本語訳が現れ、英語の質問・返答案も会話に合わせて更新されます。
+4. プロンプターは移動・サイズ変更できます。終了時は「停止」を押します。
+
+権限は「システム設定 → プライバシーとセキュリティ → 画面収録とシステムオーディオ録音 → システムオーディオ録音のみ」で確認できます。LivePrompt は画面内容を取得しません。以前の試作版に画面収録を許可していた場合は、不要ならシステム設定で解除できます。
+
+## プライバシーと制限
+
+- Apple の端末内 Speech、Translation、Foundation Models を使用します。録音や文字起こしをディスクに保存せず、独自のサーバーにも送信しません。初回は macOS が言語資産を取得する場合があります。
+- マイク音声、DRM などで保護された音声、話者分離、会議への自動返答は対象外です。
+- 英語の提案は下書きです。会話だけでは事実に基づく返答を作れない場合、事実や約束を足さず確認の質問を提示します。発話や送信は自動で行いません。
+- 「音声・言語モデルを準備中…」が長時間続く場合はアプリを終了し、システムオーディオ録音の許可を確認して再起動してください。macOS 27 で開発中に ad-hoc 再署名を繰り返すと、Core Audio の登録が待機した例があり、安定版バイナリの公開前に再検証が必要です。
+
+## 開発と確認状況
+
+SwiftPM と Apple の Core Audio taps、SpeechAnalyzer、Translation、Foundation Models、SwiftUI、AppKit を使用します。開発機は macOS 27 の Apple M2。Mac の合成英語音声で字幕・訳文・提案・停止と再開始を確認しました。Zoom、Meet、Teams の実会議音声ではまだ確認していません。
+
+[要件](requirements.md)、[設計](design.md)、[作業計画](tasks.md)と[公開要件](release-requirements.md)も参照してください。
+
+## ライセンス
+
+MIT。詳しくは [LICENSE](LICENSE) を参照してください。
