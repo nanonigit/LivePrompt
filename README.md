@@ -43,11 +43,11 @@ The permission is listed in **System Settings → Privacy & Security → Screen 
 - Processing uses Apple's on-device Speech, Translation, and Foundation Models. LivePrompt does not save recordings or transcripts to disk or send them to its own server. macOS may download language assets on first use.
 - Microphone input, protected audio such as DRM content, speaker separation, and automatic meeting replies are outside the current scope.
 - Suggestions are drafts. When the conversation does not support a factual answer, the app suggests a clarification instead of inventing facts or commitments. It never speaks or sends a message for you.
-- If **Preparing audio and language models** remains visible for an unusually long time, quit the app, confirm its System Audio Recording permission, and reopen it. During development on macOS 27, Core Audio registration sometimes stalled after repeated ad-hoc rebuilds; this requires further verification before a stable binary release.
+- On first launch after a local build, **Preparing audio and language models** can take several minutes on macOS 27 while Core Audio registers the tap. If it does not finish, quit the app, confirm its System Audio Recording permission, and reopen it. Subsequent starts were fast in local tests.
 
 ## Development and verification
 
-The project uses SwiftPM and Apple's Core Audio taps, SpeechAnalyzer, Translation, Foundation Models, SwiftUI, and AppKit. The local test Mac is an Apple M2 running macOS 27. Synthesized English playback has produced captions, Japanese translations, suggestions, and successful stop/restart cycles. Real Zoom, Meet, and Teams meetings have not yet been tested.
+The project uses SwiftPM and Apple's Core Audio taps, SpeechAnalyzer, Translation, Foundation Models, SwiftUI, and AppKit. The local test Mac is an Apple M2 running macOS 27. The release build produced captions, Japanese translations, suggestions, and successful stop/restart cycles from synthesized English playback. The initial Core Audio setup sometimes took several minutes. Real Zoom, Meet, and Teams meetings have not yet been tested.
 
 See [requirements](requirements.md), [design](design.md), and [tasks](tasks.md) for the original app plan, and [release requirements](release-requirements.md) for distribution gates.
 

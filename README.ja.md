@@ -43,11 +43,11 @@ open dist/LivePrompt.app
 - Apple の端末内 Speech、Translation、Foundation Models を使用します。録音や文字起こしをディスクに保存せず、独自のサーバーにも送信しません。初回は macOS が言語資産を取得する場合があります。
 - マイク音声、DRM などで保護された音声、話者分離、会議への自動返答は対象外です。
 - 英語の提案は下書きです。会話だけでは事実に基づく返答を作れない場合、事実や約束を足さず確認の質問を提示します。発話や送信は自動で行いません。
-- 「音声・言語モデルを準備中…」が長時間続く場合はアプリを終了し、システムオーディオ録音の許可を確認して再起動してください。macOS 27 で開発中に ad-hoc 再署名を繰り返すと、Core Audio の登録が待機した例があり、安定版バイナリの公開前に再検証が必要です。
+- ローカルビルド後の初回起動では、macOS 27 で Core Audio の登録に数分かかる場合があります。「音声・言語モデルを準備中…」が完了しない場合はアプリを終了し、システムオーディオ録音の許可を確認して再起動してください。ローカルテストでは2回目以降の開始は速やかでした。
 
 ## 開発と確認状況
 
-SwiftPM と Apple の Core Audio taps、SpeechAnalyzer、Translation、Foundation Models、SwiftUI、AppKit を使用します。開発機は macOS 27 の Apple M2。Mac の合成英語音声で字幕・訳文・提案・停止と再開始を確認しました。Zoom、Meet、Teams の実会議音声ではまだ確認していません。
+SwiftPM と Apple の Core Audio taps、SpeechAnalyzer、Translation、Foundation Models、SwiftUI、AppKit を使用します。開発機は macOS 27 の Apple M2。リリースビルドで、Mac の合成英語音声から字幕・訳文・提案・停止と再開始を確認しました。初回の Core Audio 準備には数分かかる場合がありました。Zoom、Meet、Teams の実会議音声ではまだ確認していません。
 
 [要件](requirements.md)、[設計](design.md)、[作業計画](tasks.md)と[公開要件](release-requirements.md)も参照してください。
 
