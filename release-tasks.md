@@ -7,3 +7,4 @@
 5. `nanonigit/LivePrompt` を公開してタグと GitHub Release を作る。
 6. `nanonigit/homebrew-liveprompt` の Formula を作り、audit と実インストールを確認して公開する。
 7. リンク、インストール手順、既知の制限を日英 README と Release で最終確認する。
+8. Homebrew のサンドボックス内で SwiftPM マニフェストの実行が失敗する問題を修正し、再度 Formula の audit/install/test を通す。

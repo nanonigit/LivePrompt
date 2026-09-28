@@ -9,7 +9,7 @@ case "$CONFIGURATION" in
 esac
 
 APP_NAME="LivePrompt"
-APP_VERSION="0.1.1"
+APP_VERSION="0.1.2"
 BUNDLE_ID="com.naoki.liveprompt"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_BUNDLE="$ROOT_DIR/dist/$APP_NAME.app"
@@ -21,8 +21,12 @@ if [[ -d /Library/Developer/CommandLineTools ]]; then
 fi
 
 cd "$ROOT_DIR"
-swift build --build-system native -c "$BUILD_CONFIGURATION"
-BUILD_BINARY="$(swift build --build-system native -c "$BUILD_CONFIGURATION" --show-bin-path)/$APP_NAME"
+SWIFT_BUILD_ARGS=(--build-system native -c "$BUILD_CONFIGURATION")
+if [[ "${LIVEPROMPT_HOMEBREW_BUILD:-0}" == "1" ]]; then
+  SWIFT_BUILD_ARGS+=(--disable-sandbox --disable-dependency-cache --manifest-cache local)
+fi
+swift build "${SWIFT_BUILD_ARGS[@]}"
+BUILD_BINARY="$(swift build "${SWIFT_BUILD_ARGS[@]}" --show-bin-path)/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_CONTENTS/MacOS"
