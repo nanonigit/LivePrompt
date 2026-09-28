@@ -8,3 +8,4 @@
 6. `nanonigit/homebrew-liveprompt` の Formula を作り、audit と実インストールを確認して公開する。
 7. リンク、インストール手順、既知の制限を日英 README と Release で最終確認する。
 8. Homebrew のサンドボックス内で SwiftPM マニフェストの実行が失敗する問題を修正し、再度 Formula の audit/install/test を通す。
+9. 日英 README と Release のインストール手順に、`/Applications` への任意のリンクと既存アプリを保持する条件を記載して確認する。

@@ -20,6 +20,14 @@ brew install nanonigit/liveprompt/liveprompt
 liveprompt
 ```
 
+Formula は `LivePrompt.app` を Homebrew の管理ディレクトリに置きます。**アプリケーション**フォルダにも表示したい場合は、Homebrew の安定したパスへのリンクを作成してください。
+
+```sh
+ln -s "$(brew --prefix nanonigit/liveprompt/liveprompt)/libexec/LivePrompt.app" /Applications/LivePrompt.app
+```
+
+既に `/Applications/LivePrompt.app` がある場合、このコマンドは上書きしません。Homebrew で更新すると、リンク先のアプリも新しい版に切り替わります。このリンクは Homebrew の管理外なので、LivePrompt をアンインストールした場合は手動で削除してください。
+
 Swift 6.4 と Xcode Command Line Tools で手動ビルドする場合:
 
 ```sh

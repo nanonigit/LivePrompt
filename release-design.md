@@ -13,6 +13,7 @@
 - GitHub Release では GitHub の自動ソースアーカイブを Homebrew Formula の取得元とする。署名済み・公証済みバイナリは Developer ID が用意できるまで公開しない。
 - `homebrew-liveprompt/Formula/liveprompt.rb` はタグのアーカイブを SHA256 で固定し、ユーザーの Mac で `.app` をビルドする。ランチャー `liveprompt` と明示した使い方を提供する。
 - Homebrew の外側サンドボックス内では SwiftPM の内側サンドボックスを作れないため、Formula からのビルド時だけ `swift build --disable-sandbox` を指定する。通常の手動ビルドでは SwiftPM の既定動作を保つ。
+- Formula の管理外である `/Applications` には Formula のインストール処理から書き込まない。必要なユーザーには Homebrew の安定した `opt` パスを指すシンボリックリンクを案内する。
 
 ## 検証
 

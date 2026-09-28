@@ -20,6 +20,14 @@ brew install nanonigit/liveprompt/liveprompt
 liveprompt
 ```
 
+The formula keeps `LivePrompt.app` in Homebrew's managed directory. To also show it in **Applications**, create a link to Homebrew's stable app path:
+
+```sh
+ln -s "$(brew --prefix nanonigit/liveprompt/liveprompt)/libexec/LivePrompt.app" /Applications/LivePrompt.app
+```
+
+The command refuses to overwrite an existing `/Applications/LivePrompt.app`. Homebrew upgrades continue to update the app behind this link. The link is separate from Homebrew, so remove it yourself if you uninstall LivePrompt.
+
 To build manually with Swift 6.4 and the Xcode Command Line Tools:
 
 ```sh
