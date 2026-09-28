@@ -14,7 +14,10 @@ struct LivePromptApp: App {
         .defaultSize(width: 680, height: 560)
         .windowResizability(.contentMinSize)
 
-        MenuBarExtra("LivePrompt", systemImage: "captions.bubble") {
+        MenuBarExtra("LivePrompt", systemImage: "captions.bubble", isInserted: Binding(
+            get: { model.showMenuBarIcon },
+            set: { model.setMenuBarIconVisible($0) }
+        )) {
             MenuBarControls(model: model)
         }
     }
@@ -49,8 +52,22 @@ private struct MenuBarControls: View {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private let launchDate = Date()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        let showDock = UserDefaults.standard.object(forKey: "showDockIcon") as? Bool ?? true
+        NSApp.setActivationPolicy(showDock ? .regular : .accessory)
+        if showDock { NSApp.activate(ignoringOtherApps: true) }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        UsageHistoryStore().endOpenSessions(startedAfter: launchDate)
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag, let window = sender.windows.first(where: { $0.title == "LivePrompt" }) {
+            window.makeKeyAndOrderFront(nil)
+        }
+        return true
     }
 }

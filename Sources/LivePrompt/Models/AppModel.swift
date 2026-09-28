@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import Foundation
 import Observation
@@ -18,6 +19,10 @@ final class AppModel {
             UserDefaults.standard.set(promptTransparency, forKey: "promptTransparency")
         }
     }
+    private(set) var showMenuBarIcon: Bool
+    private(set) var showDockIcon: Bool
+    private(set) var displaySettingError: String?
+    private(set) var usageSessions: [UsageSession] = []
     private(set) var loginItemStatus = SMAppService.mainApp.status
     private(set) var loginItemError: String?
     private(set) var state: CaptureState = .idle
@@ -39,10 +44,50 @@ final class AppModel {
     @ObservationIgnored private var transcriptRevision = 0
     @ObservationIgnored private var lastSuggestedRevision = 0
     @ObservationIgnored private var lastSuggestionAt: Date?
+    @ObservationIgnored private let usageHistory = UsageHistoryStore()
+    @ObservationIgnored private var activeUsageSessionID: UUID?
+    @ObservationIgnored private var historyRetentionTimer: Timer?
 
     init() {
         let saved = UserDefaults.standard.object(forKey: "promptTransparency") as? Double ?? 0.2
         promptTransparency = min(max(saved, 0), 0.8)
+        let menuBar = UserDefaults.standard.object(forKey: "showMenuBarIcon") as? Bool ?? true
+        let dock = UserDefaults.standard.object(forKey: "showDockIcon") as? Bool ?? true
+        showMenuBarIcon = menuBar || !dock
+        showDockIcon = dock
+        usageSessions = usageHistory.sessions()
+        historyRetentionTimer = Timer.scheduledTimer(withTimeInterval: 3_600, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in self?.refreshUsageSessions() }
+        }
+    }
+
+    func setMenuBarIconVisible(_ visible: Bool) {
+        guard visible || showDockIcon else {
+            displaySettingError = "メニューバーかDockのどちらか一方は表示してください。"
+            return
+        }
+        showMenuBarIcon = visible
+        UserDefaults.standard.set(visible, forKey: "showMenuBarIcon")
+        displaySettingError = nil
+    }
+
+    func setDockIconVisible(_ visible: Bool) {
+        guard visible || showMenuBarIcon else {
+            displaySettingError = "メニューバーかDockのどちらか一方は表示してください。"
+            return
+        }
+        guard NSApp.setActivationPolicy(visible ? .regular : .accessory) else {
+            displaySettingError = "Dockアイコンの表示を変更できませんでした。"
+            return
+        }
+        showDockIcon = visible
+        UserDefaults.standard.set(visible, forKey: "showDockIcon")
+        displaySettingError = nil
+        if visible { NSApp.activate(ignoringOtherApps: true) }
+    }
+
+    func refreshUsageSessions() {
+        usageSessions = usageHistory.sessions()
     }
 
     func refreshLoginItemStatus() {
@@ -116,6 +161,8 @@ final class AppModel {
                 return
             }
             state = .listening
+            activeUsageSessionID = usageHistory.start()
+            refreshUsageSessions()
             eventTask = Task { [weak self] in
                 for await event in events {
                     guard let self, !Task.isCancelled else { return }
@@ -144,6 +191,11 @@ final class AppModel {
         translationConfiguration = nil
         await capture.stop()
         await transcription.stop()
+        if let activeUsageSessionID {
+            usageHistory.end(activeUsageSessionID)
+            self.activeUsageSessionID = nil
+            refreshUsageSessions()
+        }
         partialEnglish = ""
         state = .idle
         panel.hide()

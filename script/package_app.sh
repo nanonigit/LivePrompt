@@ -9,10 +9,11 @@ case "$CONFIGURATION" in
 esac
 
 APP_NAME="LivePrompt"
-APP_VERSION="0.1.2"
+APP_VERSION="0.1.3"
 BUNDLE_ID="com.naoki.liveprompt"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_BUNDLE="$ROOT_DIR/dist/$APP_NAME.app"
+OUTPUT_DIR="${LIVEPROMPT_OUTPUT_DIR:-$ROOT_DIR/dist}"
+APP_BUNDLE="$OUTPUT_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_BINARY="$APP_CONTENTS/MacOS/$APP_NAME"
 
@@ -30,8 +31,18 @@ BUILD_BINARY="$(swift build "${SWIFT_BUILD_ARGS[@]}" --show-bin-path)/$APP_NAME"
 
 rm -rf "$APP_BUNDLE"
 mkdir -p "$APP_CONTENTS/MacOS"
+mkdir -p "$APP_CONTENTS/Resources"
 cp "$BUILD_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
+
+ICONSET_DIR="$(mktemp -d "${TMPDIR:-/tmp}/LivePrompt.XXXXXX.iconset")"
+trap 'rm -rf "$ICONSET_DIR"' EXIT
+for size in 16 32 128 256 512; do
+  sips -z "$size" "$size" "$ROOT_DIR/Assets/AppIcon.png" --out "$ICONSET_DIR/icon_${size}x${size}.png" >/dev/null
+  double_size=$((size * 2))
+  sips -z "$double_size" "$double_size" "$ROOT_DIR/Assets/AppIcon.png" --out "$ICONSET_DIR/icon_${size}x${size}@2x.png" >/dev/null
+done
+iconutil -c icns -o "$APP_CONTENTS/Resources/AppIcon.icns" "$ICONSET_DIR"
 
 cat > "$APP_CONTENTS/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -43,7 +54,8 @@ cat > "$APP_CONTENTS/Info.plist" <<PLIST
   <key>CFBundleName</key><string>$APP_NAME</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$APP_VERSION</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleVersion</key><string>3</string>
+  <key>CFBundleIconFile</key><string>AppIcon.icns</string>
   <key>LSMinimumSystemVersion</key><string>26.0</string>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSAudioCaptureUsageDescription</key><string>Macで再生される音声を英語字幕と日本語訳にするために使用します。録音は保存しません。</string>
