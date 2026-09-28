@@ -9,7 +9,7 @@ case "$CONFIGURATION" in
 esac
 
 APP_NAME="LivePrompt"
-APP_VERSION="0.1.0"
+APP_VERSION="0.1.1"
 BUNDLE_ID="com.naoki.liveprompt"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_BUNDLE="$ROOT_DIR/dist/$APP_NAME.app"

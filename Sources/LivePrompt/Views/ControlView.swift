@@ -1,7 +1,9 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 struct ControlView: View {
+    @Environment(\.scenePhase) private var scenePhase
     let model: AppModel
 
     var body: some View {
@@ -65,11 +67,53 @@ struct ControlView: View {
             Divider()
             SuggestionView(model: model)
 
+            GroupBox("表示と起動") {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("プロンプターの透明度")
+                        Slider(
+                            value: Binding(
+                                get: { model.promptTransparency },
+                                set: { model.promptTransparency = $0 }
+                            ),
+                            in: 0...0.8,
+                            step: 0.05
+                        )
+                        Text("\(Int((model.promptTransparency * 100).rounded()))%")
+                            .monospacedDigit()
+                            .frame(width: 42, alignment: .trailing)
+                    }
+                    Toggle("ログイン時に起動", isOn: Binding(
+                        get: { model.loginItemStatus == .enabled || model.loginItemStatus == .requiresApproval },
+                        set: { model.setLaunchAtLogin($0) }
+                    ))
+                    if model.loginItemStatus == .requiresApproval {
+                        HStack {
+                            Text("macOSの承認が必要です。")
+                            Button("ログイン項目の設定を開く") {
+                                SMAppService.openSystemSettingsLoginItems()
+                            }
+                        }
+                        .font(.caption)
+                    }
+                    if let loginItemError = model.loginItemError {
+                        Text(loginItemError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             Text("初回はシステム音声の収録許可と言語モデルのダウンロードが必要です。音声と会話内容は保存しません。")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear(perform: model.refreshLoginItemStatus)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { model.refreshLoginItemStatus() }
+        }
     }
 }

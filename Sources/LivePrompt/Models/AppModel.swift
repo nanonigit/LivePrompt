@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import Observation
+import ServiceManagement
 import Translation
 
 private struct TranslationJob {
@@ -12,6 +13,13 @@ private struct TranslationJob {
 @MainActor
 @Observable
 final class AppModel {
+    var promptTransparency: Double {
+        didSet {
+            UserDefaults.standard.set(promptTransparency, forKey: "promptTransparency")
+        }
+    }
+    private(set) var loginItemStatus = SMAppService.mainApp.status
+    private(set) var loginItemError: String?
     private(set) var state: CaptureState = .idle
     private(set) var lines: [CaptionLine] = []
     private(set) var partialEnglish = ""
@@ -31,6 +39,29 @@ final class AppModel {
     @ObservationIgnored private var transcriptRevision = 0
     @ObservationIgnored private var lastSuggestedRevision = 0
     @ObservationIgnored private var lastSuggestionAt: Date?
+
+    init() {
+        let saved = UserDefaults.standard.object(forKey: "promptTransparency") as? Double ?? 0.2
+        promptTransparency = min(max(saved, 0), 0.8)
+    }
+
+    func refreshLoginItemStatus() {
+        loginItemStatus = SMAppService.mainApp.status
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+            loginItemError = nil
+        } catch {
+            loginItemError = "ログイン項目を変更できませんでした: \(error.localizedDescription)"
+        }
+        refreshLoginItemStatus()
+    }
 
     var statusText: String {
         switch state {

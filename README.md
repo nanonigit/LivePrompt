@@ -31,10 +31,12 @@ During development, `./script/build_and_run.sh --verify` builds a debug app, lau
 
 ## Use
 
-1. Open LivePrompt and click **Start**.
+1. Open LivePrompt and click **Start** in the main window or from its menu bar icon.
 2. On first use, allow **System Audio Recording** if macOS asks. Wait for the English speech and translation assets to finish preparing.
 3. Play English audio in Zoom, Meet, Teams, a browser, or another app. English captions appear first; Japanese translations follow. Suggested English questions and replies update as the conversation progresses.
-4. Drag or resize the floating prompt as needed. Click **Stop** when finished.
+4. Drag or resize the floating prompt as needed. Click **Stop** in the main window, floating prompt, or menu bar when finished. The menu bar icon can reopen the main window after you close it.
+
+In **Display and startup**, use the slider to set the floating prompt background transparency from 0% to 80%. Captions remain fully opaque. The setting is saved between launches. Turn on **Launch at login** if you want the app to open when you sign in; macOS may ask you to approve it in Login Items. Audio capture does not start automatically at login.
 
 The permission is listed in **System Settings → Privacy & Security → Screen & System Audio Recording → System Audio Recording Only**. LivePrompt uses the audio-only permission and does not capture your screen. If you granted screen recording to an earlier prototype, you may remove that old permission in System Settings.
 

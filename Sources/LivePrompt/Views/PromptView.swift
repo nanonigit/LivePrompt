@@ -58,7 +58,10 @@ struct PromptView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+        .background {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(nsColor: .windowBackgroundColor).opacity(1 - model.promptTransparency))
+        }
         .translationTask(model.translationConfiguration) { session in
             await model.consumeTranslations(using: session)
         }
